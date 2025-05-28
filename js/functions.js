@@ -42,7 +42,7 @@ membersLink.addEventListener('click', () => {
     Bread.textContent = 'Logs'; 
 });
 asstitantlink.addEventListener('click', () => {
-    showContent('asstitant-content', 'Courts');
-    Bread.textContent = 'Courts'; 
+    showContent('asstitant-content', 'Car');
+    Bread.textContent = 'Car'; 
 });
 

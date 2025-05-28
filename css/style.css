@@ -605,7 +605,7 @@ body {
 	box-sizing: content-box;
 }
 #sidebar .brand .bx {
-    min-width: 70px;
+    min-width: 205px;
     min-height: 70px;
 	display: flex;
 	justify-content: center;
@@ -903,13 +903,13 @@ body {
 	justify-content: center;
 	align-items: center;
 }
-/* 1. Available Courts - Green */
+/* 1. Available Cars - Green */
 #content main .box-info li:nth-child(1) .bx {
 	background: #90EE90; /* Light green */
 	color: #008000;       /* Dark green */
 }
 
-/* 2. Unavailable Courts - Red */
+/* 2. Unavailable Cars - Red */
 #content main .box-info li:nth-child(2) .bx {
 	background: #FFCCCB; /* Light red */
 	color: #ff0000;       /* Bright red */

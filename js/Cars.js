@@ -4,27 +4,27 @@ import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://ww
 
 // Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyAGT4ZK8L-bcQzRQ65pVzmsukd9Zx-75uQ",
-    authDomain: "courtreservesystem.firebaseapp.com",
-    databaseURL: "https://courtreservesystem-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "courtreservesystem",
-    storageBucket: "courtreservesystem.firebasestorage.app",
-    messagingSenderId: "416725094441",
-    appId: "1:416725094441:web:90940d3e42f43549728c38",
-    measurementId: "G-3X5LDP2C5N"
+  apiKey: "AIzaSyD29zvJ5gOvHRgk1qUWFzZJL8foY1sf8bk",
+  authDomain: "primeroastweb.firebaseapp.com",
+  databaseURL: "https://primeroastweb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "primeroastweb",
+  storageBucket: "primeroastweb.appspot.com",
+  messagingSenderId: "157736544071",
+  appId: "1:157736544071:web:2713ba60d8edddc5344e62",
+  measurementId: "G-MGMCTZCX2G"
 };
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const storage = getStorage(app);
 
-// Add court
-// Add court
-document.getElementById('addCourtBtn').addEventListener('click', async () => {
+// Add Car
+// Add Car
+document.getElementById('addCarBtn').addEventListener('click', async () => {
     const { value: formValues } = await Swal.fire({
-        title: 'Add Court',
+        title: 'Add Car',
         html: `
-            <input id="courtName" class="swal2-input" placeholder="Court Name">
+            <input id="CarName" class="swal2-input" placeholder="Car Name">
             <input id="location" class="swal2-input" placeholder="Location">
             <input id="rate" type="number" min="0" class="swal2-input" placeholder="Rate in ₱ (Pesos)">
             <select id="status" class="swal2-input">
@@ -33,15 +33,15 @@ document.getElementById('addCourtBtn').addEventListener('click', async () => {
                 <option value="In Use">In Use</option>
             </select>
             <label>Select 3 Images:</label>
-            <input type="file" id="courtImages" class="swal2-file" multiple accept="image/*">
+            <input type="file" id="CarImages" class="swal2-file" multiple accept="image/*">
         `,
         focusConfirm: false,
         preConfirm: async () => {
-            const name = document.getElementById('courtName').value;
+            const name = document.getElementById('CarName').value;
             const location = document.getElementById('location').value;
             const status = document.getElementById('status').value;
             const rate = document.getElementById('rate').value;
-            const files = document.getElementById('courtImages').files;
+            const files = document.getElementById('CarImages').files;
 
             if (!name || !location || !status || !rate || files.length !== 3) {
                 Swal.showValidationMessage("Please fill all fields, set a rate, and upload exactly 3 images.");
@@ -51,7 +51,7 @@ document.getElementById('addCourtBtn').addEventListener('click', async () => {
             const imageURLs = [];
             for (let i = 0; i < 3; i++) {
                 const file = files[i];
-                const imageRef = sRef(storage, `courts/${Date.now()}_${file.name}`);
+                const imageRef = sRef(storage, `Cars/${Date.now()}_${file.name}`);
                 await uploadBytes(imageRef, file);
                 const downloadURL = await getDownloadURL(imageRef);
                 imageURLs.push(downloadURL);
@@ -62,48 +62,48 @@ document.getElementById('addCourtBtn').addEventListener('click', async () => {
     });
 
     if (formValues) {
-        const courtRef = push(ref(database, 'courts'));
-        await set(courtRef, {
-            courtName: formValues.name,
+        const CarRef = push(ref(database, 'Cars'));
+        await set(CarRef, {
+            CarName: formValues.name,
             location: formValues.location,
             status: formValues.status,
             rate: parseFloat(formValues.rate),
             images: formValues.images
         });
-        Swal.fire('Success', 'Court added with images and rate!', 'success');
+        Swal.fire('Success', 'Car added with images and rate!', 'success');
     }
 });
 
-// Load courts
-function loadCourts() {
-    const courtsRef = ref(database, 'courts');
+// Load Cars
+function loadCars() {
+    const CarsRef = ref(database, 'Cars');
     const tableBody = document.getElementById('AssistantDiv');
 
-    onValue(courtsRef, (snapshot) => {
+    onValue(CarsRef, (snapshot) => {
         tableBody.innerHTML = '';
 
         snapshot.forEach((childSnapshot) => {
-            const court = childSnapshot.val();
-            const courtId = childSnapshot.key;
+            const Car = childSnapshot.val();
+            const CarId = childSnapshot.key;
 
             const row = document.createElement('tr');
             const imageBtn = `
-                <button class="view-images-btn" data-images='${JSON.stringify(court.images || [])}'>
+                <button class="view-images-btn" data-images='${JSON.stringify(Car.images || [])}'>
                     View Images
                 </button>
             `;
 
             row.innerHTML = `
-                <td>${court.courtName}</td>
-                <td>${court.location}</td>
-                <td>${court.status}</td>
-                <td>₱${court.rate ? parseFloat(court.rate).toFixed(2) : '0.00'}</td>
+                <td>${Car.CarName}</td>
+                <td>${Car.location}</td>
+                <td>${Car.status}</td>
+                <td>₱${Car.rate ? parseFloat(Car.rate).toFixed(2) : '0.00'}</td>
                 <td>${imageBtn}</td>
                 <td>
-                   <button class="edit-btn" data-id="${courtId}" style="cursor:pointer;">
+                   <button class="edit-btn" data-id="${CarId}" style="cursor:pointer;">
                        ✏️ Edit
                    </button>
-                   <button class="delete-btn" data-id="${courtId}" style="background:none;border:none;cursor:pointer;">
+                   <button class="delete-btn" data-id="${CarId}" style="background:none;border:none;cursor:pointer;">
                        🗑️ Delete
                    </button>
                 </td>
@@ -118,38 +118,38 @@ function loadCourts() {
                 const imageHTML = images.map(url => `<img src="${url}" style="max-width:100%; margin:5px; border-radius:10px;">`).join('');
 
                 await Swal.fire({
-                    title: 'Court Images',
+                    title: 'Car Images',
                     html: `<div style="display:flex; flex-wrap:wrap; justify-content:center;">${imageHTML}</div>`,
                     width: '800px'
                 });
             });
         });
 
-        // Edit court
+        // Edit Car
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
-                const courtId = e.currentTarget.getAttribute('data-id');
-                const courtRef = ref(database, 'courts/' + courtId);
+                const CarId = e.currentTarget.getAttribute('data-id');
+                const CarRef = ref(database, 'Cars/' + CarId);
 
-                onValue(courtRef, async (snapshot) => {
-                    const court = snapshot.val();
+                onValue(CarRef, async (snapshot) => {
+                    const Car = snapshot.val();
 
-                    if (court) {
+                    if (Car) {
                         const { value: formValues } = await Swal.fire({
-                            title: 'Edit Court Details',
+                            title: 'Edit Car Details',
                             html: `
-                                <input id="courtName" class="swal2-input" value="${court.courtName}" placeholder="Court Name">
-                                <input id="location" class="swal2-input" value="${court.location}" placeholder="Location">
-                                <input id="rate" type="number" class="swal2-input" value="${court.rate || 50}" placeholder="Rate in ₱">
+                                <input id="CarName" class="swal2-input" value="${Car.CarName}" placeholder="Car Name">
+                                <input id="location" class="swal2-input" value="${Car.location}" placeholder="Location">
+                                <input id="rate" type="number" class="swal2-input" value="${Car.rate || 50}" placeholder="Rate in ₱">
                                 <select id="status" class="swal2-input">
-                                    <option value="Available" ${court.status === 'Available' ? 'selected' : ''}>Available</option>
-                                    <option value="Maintenance" ${court.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
-                                    <option value="In Use" ${court.status === 'In Use' ? 'selected' : ''}>In Use</option>
+                                    <option value="Available" ${Car.status === 'Available' ? 'selected' : ''}>Available</option>
+                                    <option value="Maintenance" ${Car.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
+                                    <option value="In Use" ${Car.status === 'In Use' ? 'selected' : ''}>In Use</option>
                                 </select>
                             `,
                             focusConfirm: false,
                             preConfirm: async () => {
-                                const name = document.getElementById('courtName').value;
+                                const name = document.getElementById('CarName').value;
                                 const location = document.getElementById('location').value;
                                 const status = document.getElementById('status').value;
                                 const rate = document.getElementById('rate').value;
@@ -164,28 +164,28 @@ function loadCourts() {
                         });
 
                         if (formValues) {
-                            await set(ref(database, 'courts/' + courtId), {
-                                courtName: formValues.name,
+                            await set(ref(database, 'Cars/' + CarId), {
+                                CarName: formValues.name,
                                 location: formValues.location,
                                 status: formValues.status,
                                 rate: parseFloat(formValues.rate),
-                                images: court.images
+                                images: Car.images
                             });
 
-                            Swal.fire('Updated!', 'Court details have been updated.', 'success');
+                            Swal.fire('Updated!', 'Car details have been updated.', 'success');
                         }
                     }
                 }, { onlyOnce: true });
             });
         });
 
-        // Delete court
+        // Delete Car
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = e.currentTarget.getAttribute('data-id');
                 const confirm = await Swal.fire({
                     title: 'Are you sure?',
-                    text: "This will permanently delete the court.",
+                    text: "This will permanently delete the Car.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -193,12 +193,12 @@ function loadCourts() {
                     confirmButtonText: 'Yes, delete it!'
                 });
                 if (confirm.isConfirmed) {
-                    await set(ref(database, 'courts/' + id), null);
-                    Swal.fire('Deleted!', 'Court has been removed.', 'success');
+                    await set(ref(database, 'Cars/' + id), null);
+                    Swal.fire('Deleted!', 'Car has been removed.', 'success');
                 }
             });
         });
     });
 }
 
-loadCourts();
+loadCars();

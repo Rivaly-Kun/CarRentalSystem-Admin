@@ -3,14 +3,14 @@ import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-d
 
 // Your Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyAGT4ZK8L-bcQzRQ65pVzmsukd9Zx-75uQ",
-    authDomain: "courtreservesystem.firebaseapp.com",
-    databaseURL: "https://courtreservesystem-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "courtreservesystem",
-    storageBucket: "courtreservesystem.firebasestorage.app",
-    messagingSenderId: "416725094441",
-    appId: "1:416725094441:web:90940d3e42f43549728c38",
-    measurementId: "G-3X5LDP2C5N"
+  apiKey: "AIzaSyD29zvJ5gOvHRgk1qUWFzZJL8foY1sf8bk",
+  authDomain: "primeroastweb.firebaseapp.com",
+  databaseURL: "https://primeroastweb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "primeroastweb",
+  storageBucket: "primeroastweb.appspot.com",
+  messagingSenderId: "157736544071",
+  appId: "1:157736544071:web:2713ba60d8edddc5344e62",
+  measurementId: "G-MGMCTZCX2G"
 };
 
 const app = initializeApp(firebaseConfig);

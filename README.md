@@ -1,20 +1,20 @@
 
-## CourtReserveScheduling Admin – Documentation
+## CarReserveScheduling Admin – Documentation
 
 ### Project Overview
 
-**CourtReserveScheduling (Admin)** is the administrative dashboard for managing courts, reservations, and user activity in the Court Reservation System. Designed for simplicity and speed, this panel allows admins to monitor and control bookings made via the public user-facing app.
+**CarReserveScheduling (Admin)** is the administrative dashboard for managing Cars, reservations, and user activity in the Car Reservation System. Designed for simplicity and speed, this panel allows admins to monitor and control bookings made via the public user-facing app.
 
 ---
 
 ### 📂 Project Structure
 
 ```
-CourtReserveScheduling/
+CarReserveScheduling/
 ├── html/                # HTML pages (dashboard, login, etc.)
 │   ├── dashboard.html
 │   ├── login.html
-│   └── court_management.html
+│   └── Car_management.html
 ├── css/                 # Stylesheets
 │   └── style.css
 ├── js/                  # JavaScript for interactivity
@@ -28,10 +28,10 @@ CourtReserveScheduling/
 ### ⚙️ Features
 
 * 🧾 **Admin Login**: Secure login page for administrator access.
-* 📊 **Dashboard**: Overview of total reservations, users, and court statuses.
-* 🏟 **Court Management**: Add, edit, or remove court details.
+* 📊 **Dashboard**: Overview of total reservations, users, and Car statuses.
+* 🏟 **Car Management**: Add, edit, or remove Car details.
 * 📅 **Reservation Logs**: View current and past reservations.
-* ❌ **Cancel Bookings**: Admins can cancel court reservations.
+* ❌ **Cancel Bookings**: Admins can cancel Car reservations.
 * 🔍 **User Activity Monitoring**: Track user interactions and bookings.
 * 🌐 **Fully Responsive**: Clean UI that works on desktop and tablet.
 
@@ -44,8 +44,8 @@ CourtReserveScheduling/
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Rivaly-Kun/CourtReserveScheduling.git
-   cd CourtReserveScheduling
+   git clone https://github.com/Rivaly-Kun/CarReserveScheduling.git
+   cd CarReserveScheduling
    ```
 
 2. Open `html/index.html` in your vscode.

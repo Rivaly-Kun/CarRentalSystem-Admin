@@ -1,17 +1,17 @@
 // admin-bookings.js
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, onValue, get, child, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, onValue, get,remove, child, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAGT4ZK8L-bcQzRQ65pVzmsukd9Zx-75uQ",
-    authDomain: "courtreservesystem.firebaseapp.com",
-    databaseURL: "https://courtreservesystem-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "courtreservesystem",
-    storageBucket: "courtreservesystem.firebasestorage.app",
-    messagingSenderId: "416725094441",
-    appId: "1:416725094441:web:90940d3e42f43549728c38",
-    measurementId: "G-3X5LDP2C5N"
+  apiKey: "AIzaSyD29zvJ5gOvHRgk1qUWFzZJL8foY1sf8bk",
+  authDomain: "primeroastweb.firebaseapp.com",
+  databaseURL: "https://primeroastweb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "primeroastweb",
+  storageBucket: "primeroastweb.appspot.com",
+  messagingSenderId: "157736544071",
+  appId: "1:157736544071:web:2713ba60d8edddc5344e62",
+  measurementId: "G-MGMCTZCX2G"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -24,6 +24,15 @@ const usersRef = ref(db, "users");
 onValue(reservationsRef, async (snapshot) => {
     postDiv.innerHTML = ""; // Clear existing rows
 
+    if (!snapshot.exists()) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td colspan="7" style="text-align: center; padding: 20px;"><em>No bookings available.</em></td>
+        `;
+        postDiv.appendChild(tr);
+        return;
+    }
+    
     const reservations = [];
     snapshot.forEach((childSnapshot) => {
         const resData = childSnapshot.val();
@@ -53,7 +62,8 @@ onValue(reservationsRef, async (snapshot) => {
         
         let actionButtons = `
        
-        <button class="reject" onclick="rejectReservation('${res.reservationId}')">
+      <button class="reject" onclick="rejectReservation('${res.reservationId}', '${res.CarId}')">
+
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 48 48"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#ff2f2f" stroke="#000" d="M24 44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C12.9543 4 4 12.9543 4 24C4 35.0457 12.9543 44 24 44Z"/><path stroke="#fff" stroke-linecap="round" d="M29.6567 18.3432L18.343 29.6569"/><path stroke="#fff" stroke-linecap="round" d="M18.3433 18.3432L29.657 29.6569"/></g></svg> Cancel
         </button>
     `;
@@ -71,7 +81,7 @@ onValue(reservationsRef, async (snapshot) => {
             <td>${fullName}</td>
             <td>${email}</td>
             <td>${phone}</td>
-            <td>${res.courtName || "Unknown Court"}</td>
+            <td>${res.CarName || "Unknown Car"}</td>
             <td>${res.startTimeReadable || "N/A"}</td>
             <td>${res.endTimeReadable || "N/A"}</td>
             <td>${actionButtons}</td>
@@ -98,20 +108,25 @@ window.acceptReservation = function (reservationId) {
 }
 
 // Global function to reject the reservation
-window.rejectReservation = function (reservationId) {
+window.rejectReservation = function (reservationId, CarId) {
     const reservationRef = ref(db, 'reservations/' + reservationId);
-
-    // Update reservation status to rejected
-    update(reservationRef, {
-        status: "rejected"
+    const CarRef = ref(db, 'Cars/' + CarId);
+console.log(CarRef);
+    // First update the Car status to available
+    update(CarRef, {
+        status: "Available"
     }).then(() => {
-        alert(`Reservation ${reservationId} rejected!`);
-        // Refresh the data to update the buttons
+        // Then remove the reservation
+        return remove(reservationRef);
+    }).then(() => {
+        alert(`Reservation ${reservationId} rejected and removed. Car is now available.`);
+        // Refresh the data to update the UI
         location.reload();
     }).catch((error) => {
-        console.error("Error rejecting reservation:", error);
+        console.error("Error rejecting reservation and updating Car:", error);
     });
-}
+};
+
 
 // Global function to cancel the reservation
 window.cancelReservation = function (reservationId) {

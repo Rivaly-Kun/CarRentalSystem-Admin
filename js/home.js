@@ -3,13 +3,13 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGT4ZK8L-bcQzRQ65pVzmsukd9Zx-75uQ",
-  authDomain: "courtreservesystem.firebaseapp.com",
-  projectId: "courtreservesystem",
-  storageBucket: "courtreservesystem.firebasestorage.app",
+  authDomain: "Carreservesystem.firebaseapp.com",
+  projectId: "Carreservesystem",
+  storageBucket: "Carreservesystem.firebasestorage.app",
   messagingSenderId: "416725094441",
   appId: "1:416725094441:web:90940d3e42f43549728c38",
   measurementId: "G-3X5LDP2C5N",
-  databaseURL: "https://courtreservesystem-default-rtdb.asia-southeast1.firebasedatabase.app/"
+  databaseURL: "https://Carreservesystem-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -17,17 +17,17 @@ const db = getDatabase(app);
 
 const reservationsRef = ref(db, "reservations");
 const productsDiv = document.getElementById("productsDiv");
-const courtsRef = ref(db, 'courts');
+const CarsRef = ref(db, 'Cars');
 
 
-// Fetch and update court availability counts
-onValue(courtsRef, (snapshot) => {
+// Fetch and update Car availability counts
+onValue(CarsRef, (snapshot) => {
     let availableCount = 0;
     let unavailableCount = 0;
 
     snapshot.forEach((childSnapshot) => {
-        const court = childSnapshot.val();
-        if (court.status === "Available") {
+        const Car = childSnapshot.val();
+        if (Car.status === "Available") {
             availableCount++;
         } else {
             unavailableCount++;
@@ -58,7 +58,14 @@ onValue(reservationsRef, (snapshot) => {
   const reservations = snapshot.val();
   productsDiv.innerHTML = ""; 
 
-  if (!reservations) return;
+  if (!reservations) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td colspan="3" style="text-align: center; font-style: italic; padding: 20px;">No reservation requests found.</td>
+    `;
+    productsDiv.appendChild(tr);
+    return;
+  }
 
   Object.entries(reservations).forEach(([resId, res]) => {
     if (!res.status || res.status.toLowerCase() !== "accepted") {
@@ -127,7 +134,19 @@ const announcementsDiv = document.getElementById("AnnouncementsDiv");
 
 onValue(reservationsRef, (snapshot) => {
   const reservations = snapshot.val();
+ 
+
   announcementsDiv.innerHTML = "";
+
+  if (!reservations) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td colspan="2" style="text-align: center; font-style: italic; padding: 20px;">No latest users found.</td>
+    `;
+    announcementsDiv.appendChild(tr);
+    return;
+  }
+  
 
   if (!reservations) return;
 

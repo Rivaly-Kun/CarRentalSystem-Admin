@@ -3,14 +3,14 @@ import { getDatabase, ref,onValue, get,update, set, remove } from "https://www.g
 
 // Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyAGT4ZK8L-bcQzRQ65pVzmsukd9Zx-75uQ",
-    authDomain: "courtreservesystem.firebaseapp.com",
-    databaseURL: "https://courtreservesystem-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "courtreservesystem",
-    storageBucket: "courtreservesystem.firebasestorage.app",
-    messagingSenderId: "416725094441",
-    appId: "1:416725094441:web:90940d3e42f43549728c38",
-    measurementId: "G-3X5LDP2C5N"
+  apiKey: "AIzaSyD29zvJ5gOvHRgk1qUWFzZJL8foY1sf8bk",
+  authDomain: "primeroastweb.firebaseapp.com",
+  databaseURL: "https://primeroastweb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "primeroastweb",
+  storageBucket: "primeroastweb.appspot.com",
+  messagingSenderId: "157736544071",
+  appId: "1:157736544071:web:2713ba60d8edddc5344e62",
+  measurementId: "G-MGMCTZCX2G"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -30,6 +30,9 @@ onValue(usersRef, (snapshot) => {
         for (let userId in usersData) {
             const user = usersData[userId];
             const { email, fullName, phone, status } = user;
+
+
+
             if (status && status.toLowerCase() === 'verified') {
 
             // Create a new table row for each user
@@ -133,80 +136,94 @@ No users
     }
 });
 
-
-
-
 const verify = ref(database, 'verify');
 
 onValue(verify, (snapshot) => {
     const userDiv = document.getElementById('UnverifiedUsers');
-    userDiv.innerHTML = ''; // Clear existing content
+    userDiv.innerHTML = '';
 
     if (!snapshot.exists()) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td colspan="5" style="text-align: center; font-style: italic; width: 100%;">
-                No users
-            </td>
+            <td colspan="5" style="text-align: center; font-style: italic; width: 100%;">No users</td>
         `;
         userDiv.appendChild(row);
-        console.log("No user data found");
         return;
     }
 
     const usersData = snapshot.val();
-    let hasUnverifiedUsers = false;
+    let foundUnverified = false;
+    let pending = 0;
+    let checked = 0;
 
     for (let userId in usersData) {
         const user = usersData[userId];
-        const { fullName, email, phone, status, idImage } = user;
+        const { fullName, email, status, idImage } = user;
 
         if (!status || status.toLowerCase() === 'unverified') {
-            hasUnverifiedUsers = true;
+            pending++;
+            const phoneRef = ref(database, `users/${userId}/phone`);
 
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${fullName}</td>
-                <td>${email}</td>
-                <td>${phone}</td>
-                <td>${status ? status : 'Unverified'}</td>
-                <td>
-                    <button class="edit-btn" data-id="${userId}" style="cursor:pointer;">Edit</button>
-                    <button class="delete-btn" data-id="${userId}" style="cursor:pointer;">Delete</button>
-                    <button class="verify-btn" data-id="${userId}" style="cursor:pointer;">Verify</button>
-                    <button class="Images-btn" data-id="${userId}" data-image="${idImage}" style="cursor:pointer;">View Images</button>
-                </td>
-            `;
-            userDiv.appendChild(row);
+            get(phoneRef).then((phoneSnap) => {
+                const phone = phoneSnap.exists() ? phoneSnap.val() : 'N/A';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${fullName}</td>
+                    <td>${email}</td>
+                    <td>${phone}</td>
+                    <td>${status || 'Unverified'}</td>
+                    <td>
+                        <button class="edit-btn" data-id="${userId}" style="cursor:pointer;">Edit</button>
+                        <button class="delete-btn" data-id="${userId}" style="cursor:pointer;">Delete</button>
+                        <button class="verify-btn" data-id="${userId}" style="cursor:pointer;">Verify</button>
+                        <button class="Images-btn" data-id="${userId}" data-image="${idImage}" style="cursor:pointer;">View Images</button>
+                    </td>
+                `;
+                userDiv.appendChild(row);
+                foundUnverified = true;
+            }).catch((error) => {
+                console.error(`Error fetching phone for user ${userId}:`, error);
+            }).finally(() => {
+                checked++;
+                if (checked === pending) {
+                    if (!foundUnverified) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td colspan="5" style="text-align: center; font-style: italic; width: 100%;">No users</td>
+                        `;
+                        userDiv.appendChild(row);
+                    }
+                    attachEventListeners(); // ✅ Bind buttons only after all DOM rows are appended
+                }
+            });
         }
     }
 
-    if (!hasUnverifiedUsers) {
+    if (pending === 0) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td colspan="5" style="text-align: center; font-style: italic; width: 100%;">
-                No users
-            </td>
+            <td colspan="5" style="text-align: center; font-style: italic; width: 100%;">No users</td>
         `;
         userDiv.appendChild(row);
     }
+}); // ✅ Properly closed `onValue`
 
-    // View Image Button
+// ✅ Helper to bind events after DOM is updated
+function attachEventListeners() {
+    // View Image
     document.querySelectorAll('.Images-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const imageUrl = e.currentTarget.getAttribute('data-image');
-
             if (!imageUrl) {
                 return Swal.fire('No Image', 'No image available for this user.', 'info');
             }
 
-            const imageHTML = `
-                <img src="${imageUrl}" style="max-width:100%; margin:5px; border-radius:10px;">
-            `;
-
             await Swal.fire({
                 title: 'User ID Image',
-                html: `<div style="display:flex; flex-wrap:wrap; justify-content:center;">${imageHTML}</div>`,
+                html: `<div style="display:flex; flex-wrap:wrap; justify-content:center;">
+                    <img src="${imageUrl}" style="max-width:100%; margin:5px; border-radius:10px;">
+                </div>`,
                 width: '800px'
             });
         });
@@ -241,11 +258,12 @@ onValue(verify, (snapshot) => {
                             return false;
                         }
 
-                        set(userRef, { fullName, email, phone });
+                        return { fullName, email, phone };
                     }
                 });
 
                 if (formValues) {
+                    await set(userRef, formValues);
                     Swal.fire('Success', 'User details updated!', 'success');
                     location.reload();
                 }
@@ -253,56 +271,38 @@ onValue(verify, (snapshot) => {
         });
     });
 
+    // Verify Button
+    document.querySelectorAll('.verify-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const userId = e.currentTarget.getAttribute('data-id');
+            const button = e.currentTarget;
 
+            const confirm = await Swal.fire({
+                title: 'Verify User?',
+                text: "Do you want to mark this user as verified?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, verify!'
+            });
 
+            if (confirm.isConfirmed) {
+                try {
+                    const userRef = ref(database, `users/${userId}`);
+                    const verifyRef = ref(database, `verify/${userId}`);
 
+                    await update(userRef, { status: 'verified' });
+                    await remove(verifyRef);
 
+                    button.closest('tr').remove();
 
-// Verify Button
-document.querySelectorAll('.verify-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-        const userId = e.currentTarget.getAttribute('data-id');
-        const button = e.currentTarget;
-
-        const confirm = await Swal.fire({
-            title: 'Verify User?',
-            text: "Do you want to mark this user as verified?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, verify!'
-        });
-
-        if (confirm.isConfirmed) {
-            try {
-                const userRef = ref(database, `users/${userId}`);
-                const verifyRef = ref(database, `verify/${userId}`);
-
-                console.log(userId);
-
-                // 1. Always just update the user's status to "verified"
-                await update(userRef, { status: 'verified' });
-
-                // 2. Always remove from verify
-                await remove(verifyRef);
-
-                // 3. Remove the table row
-                button.closest('tr').remove();
-
-                // 4. Success
-                await Swal.fire('Verified!', 'User has been verified and removed from verify list.', 'success');
-            } catch (error) {
-                console.error("Error verifying user:", error);
-                Swal.fire('Error!', 'Something went wrong during verification.', 'error');
+                    await Swal.fire('Verified!', 'User has been verified and removed from verify list.', 'success');
+                } catch (error) {
+                    console.error("Error verifying user:", error);
+                    Swal.fire('Error!', 'Something went wrong during verification.', 'error');
+                }
             }
-        }
+        });
     });
-});
-
-
-
-
-
-
-});
+}
